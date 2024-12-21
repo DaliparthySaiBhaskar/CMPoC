@@ -1,0 +1,40 @@
+- name: Play to configure web component 
+  become: true
+  hosts: web
+  tasks:
+  - name: "Install nginx"
+    ansible.builtin.dnf:
+      name: nginx
+      state: present
+
+  - name: "Remove default html directory"
+    ansible.builtin.file:
+      path: /usr/share/nginx/html
+      state: absent
+
+  - name: "Create html directory"
+    ansible.builtin.file:
+      path: /usr/share/nginx/html
+      state: directory
+
+  - name: "Download application code"
+    ansible.builtin.get_url:
+      url: https://robotshop-builds.s3.us-east-1.amazonaws.com/web.zip 
+      dest: /tmp 
+
+  - name: "Extract the application code"
+    ansible.builtin.unarchive:
+      src: /tem/web.zip 
+      dest: /usr/share/nginx/html
+      remote_src: yes 
+
+  - name: "Copy robotshop configuration"
+    ansible.builtin.copy: 
+      src: robotshop.conf 
+      dest: /etc/nginx/default.d/robotshop.conf
+
+  - name: "Start and enable nginx service"
+    ansible.builtin.service: 
+      name: nginx 
+      state: restarted 
+      enabled: yes 

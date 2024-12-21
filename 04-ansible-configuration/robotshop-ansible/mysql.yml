@@ -1,0 +1,25 @@
+- name: Play to configure mysql component
+  become: true
+  hosts: mysql
+  tasks:
+  - name: "Disable default MySQL module"
+    ansible.builtin.command: dnf module disable mysql -y
+
+  - name: "Add MySQL 8 repository"
+    ansible.builtin.template:
+      src: mysql.repo
+      dest: /etc/yum.repos.d/mysql.repo
+
+  - name: "Install MySQL server"
+    ansible.builtin.package:
+      name: mysql-community-server
+      state: present
+
+  - name: "tart and enable MySQL"
+    ansible.builtin.service:
+      name: mysqld
+      state: started
+      enabled: yes
+
+  - name: setup root password
+    ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1

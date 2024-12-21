@@ -1,0 +1,37 @@
+- name: Play to configure redis component 
+  become: true
+  hosts: redis 
+  tasks:
+  - name: "Install redis"
+    ansible.builtin.dnf: 
+      name: redis 
+      state: present 
+
+  - name: "Find the redis.conf file"
+    ansible.builtin.find:
+      paths: /
+      patterns: redis.conf
+      file_type: file
+    register: redis_conf_file
+
+  - name: "Display redis.conf file location"
+    ansible.builtin.debug:
+      msg: "Redis configuration file found at {{ item.path }}"
+    loop: "{{ redis_conf_file.files }}"
+    loop_control:
+      label: "{{ item.path }}"
+
+  - name: "Allow external connections by modifying redis.conf"
+    ansible.builtin.replace:
+      path: "{{ item.path }}"
+      regexp: 'bind 127\.0\.0\.1'
+      replace: 'bind 0.0.0.0'
+    loop: "{{ redis_conf_file.files }}"
+    loop_control:
+      label: "{{ item.path }}"
+
+  - name: "Start and enable redis service"
+    ansible.builtin.service:
+      name: redis 
+      state: started 
+      enabled: yes
