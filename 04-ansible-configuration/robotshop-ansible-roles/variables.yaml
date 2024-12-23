@@ -1,0 +1,10 @@
+MONGODB_HOST: mongodb.myroboshop.online 
+REDIS_HOST: redis.myroboshop.online
+MYSQL_HOST: mysql.myroboshop.online
+RABBITMQ_HOST: rabbitmq.myroboshop.online
+CATALOGUE_HOST: catalogue.myroboshop.online
+USER_HOST: user.myroboshop.online
+CART_HOST: cart.myroboshop.online
+SHIPPING_HOST: shipping.myroboshop.online
+PAYMENT_HOST: payment.myroboshop.online
+DISPATCH_HOST: dispatch.myroboshop.online
