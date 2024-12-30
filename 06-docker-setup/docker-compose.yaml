@@ -1,0 +1,98 @@
+services:
+  mongodb:
+    image: mongodb:v.1.0
+    container_name: mongodb
+    networks:
+    - roboshop
+    volumes:
+    - source: mongodb 
+      target: /data/db
+      type: volume
+
+  catalogue:
+    image: catalogue:v.1.0
+    container_name: catalogue
+    networks:
+    - roboshop
+    depends_on:
+    - mongodb
+
+  web:
+    image: web:v.1.0
+    container_name: web
+    ports:
+    - "80:80" 
+    depends_on:
+    - catalogue
+    - cart
+    - user
+    - shipping
+    - payment
+
+  redis:
+    image: redis
+    container_name: redis
+    volumes:
+    - source: redis
+      target: /data
+      type: volume
+
+  cart:
+    image: cart:v.1.0
+    container_name: cart
+    depends_on:
+    - redis
+    - catalogue
+
+  user:
+    image: user:v.1.0
+    container_name: user
+    depends_on:
+    - redis 
+    - mongodb
+
+  mysql:
+    image: mysql:v.1.0
+    container_name: mysql
+    volumes:
+    - source: mysql
+      target: /var/lib/mysql
+      type: volume
+
+  shipping:
+    image: shipping:v.1.0
+    container_name: shipping
+    depends_on:
+    - mysql
+
+  rabbitmq:
+    image: rabbitmq:v.1.0
+    container_name: rabbitmq
+    environment:
+    - RABBITMQ_DEFAULT_USER=roboshop
+    - RABBITMQ_DEFAULTE_PASS=roboshop123
+    volumes:
+    - source: rabbitmq
+      target: /var/lib/rabbitmq
+      type: volume
+
+  payment:
+    image: payment:v.1.0
+    container_name: payment
+    depends_on:
+    - rabbitmq
+    - user
+    - cart
+    
+networks:
+  default:
+    external: 
+      name: roboshop
+
+volumes:
+  mongodb:
+  redis:
+  mysql:
+  rabbitmq:
+
+
